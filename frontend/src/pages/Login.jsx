@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LanguageToggle from '../components/LanguageToggle';
+import { FaUserLock, FaEnvelope, FaLock } from 'react-icons/fa';
+import { API_BASE_URL } from '../apiConfig';
 
 function Login() {
     const [formData, setFormData] = useState({ email: '', password: '' });
@@ -10,7 +12,7 @@ function Login() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        fetch('http://localhost:5000/api/auth/login', {
+        fetch(`${API_BASE_URL}/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData),
@@ -29,28 +31,71 @@ function Login() {
     };
 
     return (
-        <div style={{ background: '#0a0a0a', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ position: 'absolute', top: '2rem', right: '2rem' }}><LanguageToggle /></div>
-            <div style={{ background: '#151515', padding: '3rem', borderRadius: '8px', border: '1px solid #333', width: '100%', maxWidth: '400px' }}>
-                <h2 className="serif" style={{ color: '#d4af37', textAlign: 'center', marginBottom: '2rem' }}>{t('Connexion')}</h2>
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                    <div>
-                        <label style={{ color: '#aaa', display: 'block', marginBottom: '0.5rem' }}>{t('Adresse Email')}</label>
-                        <input type="email" required className="admin-input" value={formData.email}
-                            onChange={e => setFormData({ ...formData, email: e.target.value })} />
+        <div className="min-h-screen bg-dark-bg flex items-center justify-center px-6 relative overflow-hidden">
+            {/* Background elements */}
+            <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gold/5 blur-[120px] rounded-full" />
+                <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gold/5 blur-[120px] rounded-full" />
+            </div>
+
+            <div className="absolute top-8 right-8 z-50 flex items-center gap-4">
+                <Link to="/" className="text-[10px] uppercase tracking-widest text-muted-text hover:text-gold transition-colors">{t('Accueil')}</Link>
+                <LanguageToggle />
+            </div>
+
+            <div className="w-full max-w-md bg-dark-card border border-dark-border p-8 md:p-12 rounded-2xl shadow-2xl relative z-10 animate-fade-up">
+                <div className="flex flex-col items-center mb-10">
+                    <div className="w-16 h-16 bg-gold/10 rounded-full flex items-center justify-center text-gold mb-4 border border-gold/20">
+                        <FaUserLock size={32} />
                     </div>
-                    <div>
-                        <label style={{ color: '#aaa', display: 'block', marginBottom: '0.5rem' }}>{t('Mot de Passe')}</label>
-                        <input type="password" required className="admin-input" value={formData.password}
-                            onChange={e => setFormData({ ...formData, password: e.target.value })} />
+                    <h2 className="font-serif text-3xl text-gold uppercase tracking-tighter">{t('Connexion')}</h2>
+                    <p className="text-xs text-muted-text uppercase tracking-widest mt-2">{t('Bienvenue dans l\'univers Mahmoud')}</p>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="space-y-2">
+                        <label className="text-[10px] uppercase tracking-widest text-muted-text pl-1">{t('Adresse Email')}</label>
+                        <div className="relative">
+                            <input 
+                              type="email" 
+                              required 
+                              className="w-full bg-black/40 border border-dark-border text-light-text p-4 rounded-lg focus:border-gold outline-none transition-all pl-12 text-sm" 
+                              value={formData.email}
+                              onChange={e => setFormData({ ...formData, email: e.target.value })} 
+                            />
+                            <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-text" size={16} />
+                        </div>
                     </div>
-                    <button type="submit" className="btn-buy" style={{ width: '100%' }}>{t('Se connecter')}</button>
+
+                    <div className="space-y-2">
+                        <label className="text-[10px] uppercase tracking-widest text-muted-text pl-1">{t('Mot de Passe')}</label>
+                        <div className="relative">
+                            <input 
+                              type="password" 
+                              required 
+                              className="w-full bg-black/40 border border-dark-border text-light-text p-4 rounded-lg focus:border-gold outline-none transition-all pl-12 text-sm" 
+                              value={formData.password}
+                              onChange={e => setFormData({ ...formData, password: e.target.value })} 
+                            />
+                            <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-text" size={16} />
+                        </div>
+                    </div>
+
+                    <button 
+                      type="submit" 
+                      className="w-full bg-gold text-black py-4 rounded-lg font-bold uppercase tracking-[2px] transition-all hover:bg-[#b5952f] hover:translate-y-[-2px] active:translate-y-0 shadow-lg"
+                    >
+                      {t('Se connecter')}
+                    </button>
                 </form>
-                <p style={{ color: '#666', marginTop: '1.5rem', textAlign: 'center' }}>
-                    {t('Nouveau ici ?')} <Link to="/register" style={{ color: '#d4af37', textDecoration: 'none' }}>{t('Créer un compte')}</Link>
-                </p>
-                <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-                    <Link to="/" style={{ color: '#666', fontSize: '0.9rem' }}>{t("Retour à l'accueil")}</Link>
+
+                <div className="mt-8 pt-8 border-t border-white/5 space-y-4">
+                  <p className="text-center text-[13px] text-muted-text">
+                    {t('Nouveau ici ?')} <Link to="/register" className="text-gold font-bold hover:underline transition-all ml-1">{t('Créer un compte')}</Link>
+                  </p>
+                  <div className="text-center">
+                    <Link to="/" className="text-[10px] uppercase tracking-widest text-muted-text hover:text-gold transition-colors">{t("Retour à l'accueil")}</Link>
+                  </div>
                 </div>
             </div>
         </div>

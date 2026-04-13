@@ -67,7 +67,8 @@ const resources = {
       "Prix : Ordre croissant": "Prix : Ordre croissant",
       "Prix : Ordre décroissant": "Prix : Ordre décroissant",
       "Aucun parfum ne correspond à vos filtres.": "Aucun parfum ne correspond à vos filtres.",
-      "Autre": "Autre"
+      "Autre": "Autre",
+      "Rechercher un parfum...": "Rechercher un parfum..."
     }
   },
   ar: {
@@ -134,7 +135,8 @@ const resources = {
       "Prix : Ordre croissant": "السعر: تصاعدي",
       "Prix : Ordre décroissant": "السعر: تنازلي",
       "Aucun parfum ne correspond à vos filtres.": "لا توجد عطور تطابق الفلاتر الخاصة بك.",
-      "Autre": "أخرى"
+      "Autre": "أخرى",
+      "Rechercher un parfum...": "ابحث عن عطر..."
     }
   }
 };

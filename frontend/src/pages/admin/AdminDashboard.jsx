@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { FaUsers, FaUserPlus, FaShoppingBasket, FaStar, FaChartLine } from 'react-icons/fa';
+import { API_BASE_URL } from '../../apiConfig';
 
 function AdminDashboard() {
+  const { t } = useTranslation();
   const [stats, setStats] = useState({
     totalUsers: 0,
     newUsers: 0,
@@ -11,8 +15,8 @@ function AdminDashboard() {
 
   useEffect(() => {
     Promise.all([
-      fetch('http://localhost:5000/api/users').then(r => r.json()),
-      fetch('http://localhost:5000/api/orders').then(r => r.json()),
+      fetch(`${API_BASE_URL}/users`).then(r => r.json()),
+      fetch(`${API_BASE_URL}/orders`).then(r => r.json()),
     ]).then(([users, orders]) => {
       
       const now = new Date();
@@ -26,7 +30,6 @@ function AdminDashboard() {
 
       if (Array.isArray(orders)) {
         orders.forEach(o => {
-          // On n'ajoute au chiffre d'affaires que si la commande est confirmée
           if (o.status === 'CONFIRMED') {
             totalRevenue += Number(o.totalAmount || 0);
           }
@@ -48,59 +51,45 @@ function AdminDashboard() {
     }).catch(err => console.error("Error fetching stats:", err));
   }, []);
 
-  const cardStyle = {
-    background: '#151515',
-    padding: '2.5rem',
-    borderRadius: '12px',
-    border: '1px solid #333',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.8rem',
-    flex: '1 1 250px',
-    boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
-  };
-
-  const numberStyle = {
-    fontSize: '3rem',
-    color: '#d4af37',
-    fontWeight: 'bold',
-    margin: 0
-  };
+  const StatCard = ({ title, value, sub, icon: Icon, trend }) => (
+    <div className="bg-dark-card border border-dark-border p-8 rounded-xl flex flex-col gap-4 shadow-xl animate-fade-in group hover:border-gold transition-all">
+      <div className="flex justify-between items-start">
+        <p className="text-[10px] uppercase tracking-[3px] text-muted-text font-bold">{title}</p>
+        <span className="text-gold opacity-50"><Icon size={20} /></span>
+      </div>
+      <div className="flex items-baseline gap-2">
+         <p className="text-4xl font-serif text-gold font-bold">{value}</p>
+         {trend && <span className="text-[10px] text-green-500 font-bold">{trend}</span>}
+      </div>
+      {sub && <p className="text-[10px] text-muted-text uppercase tracking-widest italic">{sub}</p>}
+    </div>
+  );
 
   return (
-    <div>
-      <h2 className="serif" style={{ color: '#f5f5f5', marginBottom: '3rem' }}>Vue d'ensemble</h2>
+    <div className="space-y-12">
+      <div className="flex items-center justify-between border-b border-white/5 pb-6">
+        <h2 className="font-serif text-3xl text-light-text uppercase tracking-tighter">{t("Vue d'ensemble")}</h2>
+        <div className="text-[10px] text-gold border border-gold/20 px-3 py-1 rounded-full uppercase tracking-widest animate-pulse">
+           {t('Temps réel')}
+        </div>
+      </div>
       
-      <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
-        
-        <div style={cardStyle}>
-          <p style={{ color: '#aaa', margin: 0, textTransform: 'uppercase', fontSize: '0.8rem', letterSpacing: '1px' }}>Total Utilisateurs</p>
-          <p style={numberStyle}>{stats.totalUsers}</p>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+        <StatCard title={t('Total Utilisateurs')} value={stats.totalUsers} icon={FaUsers} />
+        <StatCard title={t('Nouveaux Clients')} value={stats.newUsers} icon={FaUserPlus} trend="+ Estimation" />
+        <StatCard title={t('Volume Commandes')} value={stats.totalOrders} icon={FaShoppingBasket} sub={t('Commandes enregistrées')} />
+        <StatCard title={t('Activité Récente')} value={stats.newOrders} icon={FaStar} sub={t('7 derniers jours')} trend={stats.newOrders > 0 ? "+ Actif" : ""} />
+        <StatCard title={t('Chiffre d\'Affaires')} value={`${stats.revenue.toFixed(2)} TND`} icon={FaChartLine} sub={t('Ventes confirmées')} />
+      </div>
 
-        <div style={cardStyle}>
-          <p style={{ color: '#aaa', margin: 0, textTransform: 'uppercase', fontSize: '0.8rem', letterSpacing: '1px' }}>Nouveaux Utilisateurs</p>
-          <p style={numberStyle}>{stats.newUsers}</p>
-          <p style={{ margin: 0, fontSize: '0.85rem', color: '#4CAF50' }}>+ Estimation récente</p>
+      {/* Decorative graph placeholder or additional info */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
+        <div className="h-64 bg-dark-card/50 border border-dashed border-dark-border rounded-xl flex items-center justify-center p-8">
+           <p className="text-xs text-muted-text uppercase tracking-[4px] text-center italic">{t('Graphique de croissance (Bientôt disponible)')}</p>
         </div>
-
-        <div style={cardStyle}>
-          <p style={{ color: '#aaa', margin: 0, textTransform: 'uppercase', fontSize: '0.8rem', letterSpacing: '1px' }}>Achat & Vente</p>
-          <p style={numberStyle}>{stats.totalOrders}</p>
-          <p style={{ color: '#aaa', margin: 0, fontSize: '0.85rem' }}>Commandes au total</p>
+        <div className="h-64 bg-dark-card/50 border border-dashed border-dark-border rounded-xl flex items-center justify-center p-8">
+           <p className="text-xs text-muted-text uppercase tracking-[4px] text-center italic">{t('Rapport de distribution (Bientôt disponible)')}</p>
         </div>
-
-        <div style={cardStyle}>
-          <p style={{ color: '#aaa', margin: 0, textTransform: 'uppercase', fontSize: '0.8rem', letterSpacing: '1px' }}>Nouvelles Commandes</p>
-          <p style={numberStyle}>{stats.newOrders}</p>
-          <p style={{ margin: 0, fontSize: '0.85rem', color: '#4CAF50' }}>Ces 7 derniers jours</p>
-        </div>
-
-        <div style={cardStyle}>
-          <p style={{ color: '#aaa', margin: 0, textTransform: 'uppercase', fontSize: '0.8rem', letterSpacing: '1px' }}>Chiffre d'affaires Global</p>
-          <p style={numberStyle}>{stats.revenue.toFixed(2)} TND</p>
-        </div>
-
       </div>
     </div>
   );

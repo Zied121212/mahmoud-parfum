@@ -1,8 +1,12 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { FaSave, FaMagic } from 'react-icons/fa';
+import { API_BASE_URL } from '../../apiConfig';
 
 function AdminProduits() {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
-    name: '', nameAr: '', description: '', descriptionAr: '', price: '', price100ml: '', imageUrl: '', notes: '', notesAr: '', category: 'Homme', components: '', componentsAr: ''
+    name: '', nameAr: '', description: '', descriptionAr: '', price: '', price100ml: '', imageUrl: '', notes: '', notesAr: '', category: 'Homme', components: '', componentsAr: '', brand: '', brandAr: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -14,14 +18,14 @@ function AdminProduits() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    fetch('http://localhost:5000/api/products', {
+    fetch(`${API_BASE_URL}/products`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData),
     })
     .then(res => res.json())
     .then(() => {
-      setFormData({ name: '', nameAr: '', description: '', descriptionAr: '', price: '', price100ml: '', imageUrl: '', notes: '', notesAr: '', category: 'Homme', components: '', componentsAr: '' });
+      setFormData({ name: '', nameAr: '', description: '', descriptionAr: '', price: '', price100ml: '', imageUrl: '', notes: '', notesAr: '', category: 'Homme', components: '', componentsAr: '', brand: '', brandAr: '' });
       setIsSubmitting(false);
       alert('Parfum ajouté avec succès !');
     })
@@ -32,82 +36,115 @@ function AdminProduits() {
     });
   };
 
+  const InputGroup = ({ label, name, value, type = "text", required = true, rtl = false, placeholder = "" }) => (
+    <div className="space-y-2">
+      <label className="text-xs uppercase tracking-widest text-muted-text pl-1">{label}</label>
+      <input 
+        type={type} 
+        name={name} 
+        value={value} 
+        onChange={handleChange} 
+        required={required} 
+        placeholder={placeholder}
+        step={type === "number" ? "0.01" : undefined}
+        className={`w-full bg-black/40 border border-dark-border text-light-text p-3 rounded focus:border-gold outline-none transition-all placeholder:text-white/10 ${rtl ? 'text-right' : ''}`} 
+      />
+    </div>
+  );
+
   return (
-    <div style={{ background: '#151515', padding: '3rem', borderRadius: '12px', border: '1px solid #333' }}>
-      <h2 className="serif" style={{ color: '#d4af37', marginBottom: '3rem' }}>Ajouter un Nouveau Parfum</h2>
-      <form onSubmit={handleSubmit} style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
-        gap: '2.5rem' 
-      }}>
-        
-        {/* Left Column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#ccc' }}>Nom du parfum (FR)</label>
-            <input type="text" name="name" value={formData.name} onChange={handleChange} required className="admin-input" style={{ width: '100%', padding: '0.8rem' }} />
+    <div className="bg-dark-card p-6 md:p-10 border border-dark-border rounded-xl shadow-2xl animate-fade-in">
+      <div className="flex items-center gap-4 mb-10 border-b border-white/5 pb-6">
+        <FaMagic className="text-gold text-2xl" />
+        <h2 className="font-serif text-3xl text-gold uppercase tracking-tighter">{t('Ajouter un Nouveau Parfum')}</h2>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+          
+          {/* Identity Section */}
+          <div className="space-y-6">
+            <h3 className="text-gold text-[10px] uppercase tracking-[4px] border-l-2 border-gold pl-3 mb-6">{t('Identité & Marketing')}</h3>
+            <InputGroup label="Nom (FR)" name="name" value={formData.name} placeholder="Ex: Bois d'Argent" />
+            <InputGroup label="Nom (AR)" name="nameAr" value={formData.nameAr} rtl placeholder="Ex: خشب الفضة" />
+            
+            <div className="grid grid-cols-2 gap-4">
+              <InputGroup label="Marque (FR)" name="brand" value={formData.brand} placeholder="Ex: Dior" />
+              <InputGroup label="Marque (AR)" name="brandAr" value={formData.brandAr} rtl placeholder="Ex: ديور" />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs uppercase tracking-widest text-muted-text pl-1">{t('Catégorie')}</label>
+              <select 
+                name="category" 
+                value={formData.category} 
+                onChange={handleChange} 
+                required 
+                className="w-full bg-black/40 border border-dark-border text-light-text p-3 rounded focus:border-gold outline-none transition-all uppercase text-xs tracking-widest cursor-pointer"
+              >
+                <option value="Homme">Homme</option>
+                <option value="Femme">Femme</option>
+                <option value="Unisexe">Unisexe</option>
+              </select>
+            </div>
+
+            <InputGroup label="URL de l'image" name="imageUrl" value={formData.imageUrl} placeholder="https://..." />
           </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#ccc' }}>Nom du parfum (AR)</label>
-            <input type="text" name="nameAr" value={formData.nameAr} onChange={handleChange} required className="admin-input" style={{ width: '100%', padding: '0.8rem', direction: 'rtl' }} />
-          </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#ccc' }}>Catégorie</label>
-            <select name="category" value={formData.category} onChange={handleChange} required className="admin-input" style={{ width: '100%', padding: '0.8rem' }}>
-              <option value="Homme">Homme</option>
-              <option value="Femme">Femme</option>
-              <option value="Unisexe">Unisexe</option>
-            </select>
-          </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#ccc' }}>Prix 50ml (TND)</label>
-            <input type="number" step="0.01" name="price" value={formData.price} onChange={handleChange} required className="admin-input" style={{ width: '100%', padding: '0.8rem' }} />
-          </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#ccc' }}>Prix 100ml (TND)</label>
-            <input type="number" step="0.01" name="price100ml" value={formData.price100ml} onChange={handleChange} required className="admin-input" style={{ width: '100%', padding: '0.8rem' }} />
-          </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#ccc' }}>URL de l'image</label>
-            <input type="text" name="imageUrl" value={formData.imageUrl} onChange={handleChange} required placeholder="Ex: /images/luxe.png" className="admin-input" style={{ width: '100%', padding: '0.8rem' }} />
+
+          {/* Details & Pricing */}
+          <div className="space-y-6">
+            <h3 className="text-gold text-[10px] uppercase tracking-[4px] border-l-2 border-gold pl-3 mb-6">{t('Composition & Tarifs')}</h3>
+            
+            <div className="grid grid-cols-2 gap-4">
+               <InputGroup label="Prix 50ml (TND)" name="price" value={formData.price} type="number" />
+               <InputGroup label="Prix 100ml (TND)" name="price100ml" value={formData.price100ml} type="number" />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+               <InputGroup label="Notes (FR)" name="notes" value={formData.notes} placeholder="Floral, Ambré..." />
+               <InputGroup label="Notes (AR)" name="notesAr" value={formData.notesAr} rtl placeholder="زهور..." />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+               <InputGroup label="Composants (FR)" name="components" value={formData.components} placeholder="Musc, Rose..." />
+               <InputGroup label="Composants (AR)" name="componentsAr" value={formData.componentsAr} rtl placeholder="مسك..." />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs uppercase tracking-widest text-muted-text pl-1">{t('Description (FR)')}</label>
+              <textarea 
+                name="description" 
+                value={formData.description} 
+                onChange={handleChange} 
+                required 
+                className="w-full bg-black/40 border border-dark-border text-light-text p-3 rounded focus:border-gold outline-none transition-all resize-none h-24 text-sm" 
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs uppercase tracking-widest text-muted-text pl-1 text-right block">{t('Description (AR)')}</label>
+              <textarea 
+                name="descriptionAr" 
+                value={formData.descriptionAr} 
+                onChange={handleChange} 
+                required 
+                dir="rtl"
+                className="w-full bg-black/40 border border-dark-border text-light-text p-3 rounded focus:border-gold outline-none transition-all resize-none h-24 text-sm" 
+              />
+            </div>
           </div>
         </div>
 
-        {/* Right Column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-           <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#ccc' }}>Notes Olfactives (FR)</label>
-            <input type="text" name="notes" value={formData.notes} onChange={handleChange} required placeholder="Ex: Floral, Boisé..." className="admin-input" style={{ width: '100%', padding: '0.8rem' }} />
-          </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#ccc' }}>Notes Olfactives (AR)</label>
-            <input type="text" name="notesAr" value={formData.notesAr} onChange={handleChange} required placeholder="Ex: زهور، خشب..." className="admin-input" style={{ width: '100%', padding: '0.8rem', direction: 'rtl' }} />
-          </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#ccc' }}>Composants (FR)</label>
-            <input type="text" name="components" value={formData.components} onChange={handleChange} required placeholder="Ex: Musc, Essence de Rose..." className="admin-input" style={{ width: '100%', padding: '0.8rem' }} />
-          </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#ccc' }}>Composants (AR)</label>
-            <input type="text" name="componentsAr" value={formData.componentsAr} onChange={handleChange} required placeholder="Ex: مسك..." className="admin-input" style={{ width: '100%', padding: '0.8rem', direction: 'rtl' }} />
-          </div>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#ccc' }}>Description (FR)</label>
-            <textarea name="description" value={formData.description} onChange={handleChange} required className="admin-input" style={{ width: '100%', padding: '0.8rem', resize: 'none', flex: 1, minHeight: '80px' }} />
-          </div>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#ccc' }}>Description (AR)</label>
-            <textarea name="descriptionAr" value={formData.descriptionAr} onChange={handleChange} required className="admin-input" style={{ width: '100%', padding: '0.8rem', resize: 'none', flex: 1, minHeight: '80px', direction: 'rtl' }} />
-          </div>
-        </div>
-
-        {/* Full width button */}
-        <div style={{ gridColumn: '1 / -1', marginTop: '1rem', textAlign: 'right' }}>
-          <button type="submit" className="btn-buy" style={{ padding: '1rem 3rem', fontSize: '1.1rem' }} disabled={isSubmitting}>
-            {isSubmitting ? 'Ajout en cours...' : 'Enregistrer le Produit'}
+        <div className="flex justify-end pt-6 border-t border-white/5">
+          <button 
+            type="submit" 
+            disabled={isSubmitting}
+            className="flex items-center gap-3 bg-gold text-black px-10 py-4 rounded font-bold uppercase tracking-[2px] text-sm transition-all hover:bg-[#b5952f] hover:scale-105 active:scale-95 disabled:opacity-50"
+          >
+            <FaSave />
+            {isSubmitting ? t('Enregistrement...') : t('Enregistrer le Produit')}
           </button>
         </div>
-
       </form>
     </div>
   );

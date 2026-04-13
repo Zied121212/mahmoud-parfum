@@ -1,22 +1,23 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
+import { FaThLarge, FaPlusCircle, FaListUl, FaUsers, FaClipboardList, FaArrowLeft, FaBars, FaTimes } from 'react-icons/fa';
 import LanguageToggle from '../../components/LanguageToggle';
+import { API_BASE_URL } from '../../apiConfig';
 
 function AdminLayout() {
   const location = useLocation();
   const { t } = useTranslation();
   const [pendingCount, setPendingCount] = useState(0);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     let lastCount = 0;
     const fetchPendingOrders = () => {
-      fetch('http://localhost:5000/api/orders/pending/count')
+      fetch(`${API_BASE_URL}/orders/pending/count`)
         .then(res => res.json())
         .then(data => {
           if (data.count > lastCount && lastCount !== 0) {
-            // Custom notification logic: here a simple alert when a new order arrives
-            // Can be replaced by react-toastify or a custom popup if needed
             alert(t('Nouvelle commande reçue !'));
           }
           lastCount = data.count;
@@ -26,112 +27,96 @@ function AdminLayout() {
     };
 
     fetchPendingOrders();
-    const interval = setInterval(fetchPendingOrders, 10000); // 10 secondes
+    const interval = setInterval(fetchPendingOrders, 10000);
     return () => clearInterval(interval);
   }, [t]);
 
+  const navItems = [
+    { path: '/admin', label: t("Vue d'ensemble"), icon: <FaThLarge /> },
+    { path: '/admin/produits', label: t('Ajouter un produit'), icon: <FaPlusCircle /> },
+    { path: '/admin/catalogue', label: t('Catalogue'), icon: <FaListUl /> },
+    { path: '/admin/utilisateurs', label: t('Gérer les Utilisateurs'), icon: <FaUsers /> },
+    { path: '/admin/commandes', label: t('Gérer les Commandes'), icon: <FaClipboardList />, badge: pendingCount },
+  ];
+
   return (
-    <>
-      <nav className="navbar" style={{ position: 'relative', background: '#0a0a0a' }}>
-        <Link to="/" className="brand-logo">Mahmoud Parfum</Link>
-        <div className="nav-links" style={{ display: 'flex', alignItems: 'center' }}>
-          <Link to="/">{t('Retour au site')}</Link>
+    <div className="min-h-screen bg-black text-light-text flex flex-col">
+      {/* Top Bar */}
+      <nav className="h-16 luxury-glass fixed top-0 w-full z-[100] flex justify-between items-center px-6">
+        <div className="flex items-center gap-4">
+          <button 
+            className="lg:hidden text-gold p-2" 
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          >
+            {isSidebarOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+          </button>
+          <Link to="/" className="font-serif text-lg tracking-widest text-gold uppercase">Mahmoud Parfum Admin</Link>
+        </div>
+        <div className="flex items-center gap-6">
+          <Link to="/" className="text-[10px] uppercase tracking-widest text-muted-text hover:text-gold flex items-center gap-2 transition-colors">
+            <FaArrowLeft size={10} /> {t('Retour au site')}
+          </Link>
           <LanguageToggle />
         </div>
       </nav>
 
-      <div style={{ display: 'flex', minHeight: 'calc(100vh - 80px)', background: '#000' }}>
-        
-        {/* Navigation Sidebar (Left Panel) */}
-        <div style={{ 
-          width: '300px', 
-          background: '#111', 
-          borderRight: '1px solid #333',
-          padding: '2rem',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1.5rem'
-        }}>
-          <h3 className="serif" style={{ color: '#d4af37', marginBottom: '1rem', borderBottom: '1px solid #333', paddingBottom: '1rem' }}>{t('Menu Admin')}</h3>
-          
-          <Link 
-            to="/admin" 
-            style={{ 
-              color: location.pathname === '/admin' || location.pathname === '/admin/' ? '#d4af37' : '#fff',
-              textDecoration: 'none',
-              fontWeight: location.pathname === '/admin' || location.pathname === '/admin/' ? 'bold' : 'normal'
-            }}
-          >
-            {t("Vue d'ensemble")}
-          </Link>
+      <div className="flex flex-1 pt-16 h-screen">
+        {/* Navigation Sidebar */}
+        <aside className={`
+          fixed inset-y-0 left-0 z-50 w-72 bg-dark-card border-r border-dark-border transform transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-0
+          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}>
+          <div className="h-full flex flex-col p-6">
+             <h3 className="font-serif text-gold text-lg mb-8 pb-4 border-b border-white/5 uppercase tracking-widest">{t('Menu Admin')}</h3>
+             
+             <nav className="flex-1 space-y-2">
+                {navItems.map((item) => (
+                  <Link 
+                    key={item.path}
+                    to={item.path} 
+                    onClick={() => setIsSidebarOpen(false)}
+                    className={`
+                      flex items-center justify-between p-4 rounded-lg transition-all group
+                      ${(location.pathname === item.path || (item.path !== '/admin' && location.pathname.startsWith(item.path))) 
+                        ? 'bg-gold/10 text-gold border border-gold/20 font-bold' 
+                        : 'text-muted-text hover:bg-white/5 hover:text-light-text'}
+                    `}
+                  >
+                    <div className="flex items-center gap-4">
+                      <span className="text-lg opacity-70">{item.icon}</span>
+                      <span className="text-[13px] uppercase tracking-wide">{item.label}</span>
+                    </div>
+                    {item.badge > 0 && (
+                      <span className="bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold animate-pulse">
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                ))}
+             </nav>
 
-          <Link 
-            to="/admin/produits" 
-            style={{ 
-              color: location.pathname.includes('produits') ? '#d4af37' : '#fff',
-              textDecoration: 'none',
-              fontWeight: location.pathname.includes('produits') ? 'bold' : 'normal'
-            }}
-          >
-            {t('Ajouter un produit')}
-          </Link>
+             <div className="mt-auto pt-6 border-t border-white/5 text-[10px] text-muted-text uppercase tracking-widest text-center">
+                Système de Gestion v2.0
+             </div>
+          </div>
+        </aside>
 
-          <Link 
-            to="/admin/catalogue" 
-            style={{ 
-              color: location.pathname.includes('catalogue') ? '#d4af37' : '#fff',
-              textDecoration: 'none',
-              fontWeight: location.pathname.includes('catalogue') ? 'bold' : 'normal'
-            }}
-          >
-            {t('Catalogue')}
-          </Link>
+        {/* Backdrop for mobile */}
+        {isSidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden" 
+            onClick={() => setIsSidebarOpen(false)}
+          ></div>
+        )}
 
-          <Link 
-            to="/admin/utilisateurs" 
-            style={{ 
-              color: location.pathname.includes('utilisateurs') ? '#d4af37' : '#fff',
-              textDecoration: 'none',
-              fontWeight: location.pathname.includes('utilisateurs') ? 'bold' : 'normal'
-            }}
-          >
-            {t('Gérer les Utilisateurs')}
-          </Link>
-
-          <Link 
-            to="/admin/commandes" 
-            style={{ 
-              color: location.pathname.includes('commandes') ? '#d4af37' : '#fff',
-              textDecoration: 'none',
-              fontWeight: location.pathname.includes('commandes') ? 'bold' : 'normal',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between'
-            }}
-          >
-            {t('Gérer les Commandes')}
-            {pendingCount > 0 && (
-              <span style={{
-                background: '#ff4d4d',
-                color: '#fff',
-                fontSize: '0.75rem',
-                padding: '2px 8px',
-                borderRadius: '12px',
-                fontWeight: 'bold'
-              }}>
-                {pendingCount}
-              </span>
-            )}
-          </Link>
-        </div>
-
-        {/* Main Content Area (Right) */}
-        <div style={{ flex: 1, padding: '3rem', overflowY: 'auto' }}>
-          <Outlet />
-        </div>
-
+        {/* Main Content Area */}
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 lg:p-12 scrollbar-thin scrollbar-thumb-gold/20">
+          <div className="max-w-7xl mx-auto">
+             <Outlet />
+          </div>
+        </main>
       </div>
-    </>
+    </div>
   );
 }
 

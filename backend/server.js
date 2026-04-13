@@ -17,7 +17,7 @@ require('./models/Notification');
 
 const app = express();
 
-app.use(cors({ origin: 'http://localhost:5173' }));
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 
 app.use('/api/products', productRoutes);
@@ -28,8 +28,8 @@ app.use('/api/notifications', notificationRoutes);
 
 const PORT = process.env.PORT || 8080;
 
-app.listen(PORT, async () => {
-  console.log(`Server is running on port ${PORT}`);
+app.listen(PORT, '0.0.0.0', async () => {
+  console.log(`Server is running on port ${PORT} (External)`);
   try {
     await sequelize.authenticate();
     console.log('PostgreSQL connected.');

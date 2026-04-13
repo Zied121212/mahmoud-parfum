@@ -5,14 +5,15 @@ const User = require('../models/User');
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
-    const { fullName, email, password } = req.body;
+    const { fullName, password, phone } = req.body;
+    const email = req.body.email.trim().toLowerCase();
     
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
       return res.status(400).json({ message: "Un utilisateur avec cet email existe déjà." });
     }
 
-    const newUser = await User.create({ fullName, email, password });
+    const newUser = await User.create({ fullName, email, password, phone });
     
     const userToReturn = {
         id: newUser.id,
@@ -29,7 +30,8 @@ router.post('/register', async (req, res) => {
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { password } = req.body;
+    const email = req.body.email.trim().toLowerCase();
     
     const user = await User.findOne({ where: { email } });
     if (!user) {

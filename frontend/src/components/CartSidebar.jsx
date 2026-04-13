@@ -1,7 +1,8 @@
 import { useCart } from '../context/CartContext';
-import { FaTimes, FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
+import { FaTimes, FaTrash, FaPlus, FaMinus, FaShoppingBag } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { API_BASE_URL } from '../apiConfig';
 
 function CartSidebar() {
   const { cartItems, isCartOpen, setIsCartOpen, removeFromCart, updateQuantity, cartTotal, clearCart } = useCart();
@@ -29,7 +30,7 @@ function CartSidebar() {
     };
 
     try {
-        const response = await fetch('http://localhost:5000/api/orders', {
+        const response = await fetch(`${API_BASE_URL}/orders`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -49,37 +50,68 @@ function CartSidebar() {
   };
 
   return (
-    <>
-      {/* Overlay sombre */}
-      <div className="cart-overlay" onClick={() => setIsCartOpen(false)}></div>
+    <div className="fixed inset-0 z-[1000] flex justify-end">
+      {/* Overlay sombre avec flou */}
+      <div 
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in" 
+        onClick={() => setIsCartOpen(false)}
+      ></div>
       
       {/* Tiroir du panier */}
-      <div className="cart-sidebar">
-        <div className="cart-header">
-          <h2 className="serif">{t('Votre Panier')}</h2>
-          <button className="cart-close-btn" onClick={() => setIsCartOpen(false)}>
-            <FaTimes />
+      <div className="relative w-full max-w-md h-full bg-dark-bg border-l border-dark-border flex flex-col shadow-2xl animate-slide-in-right">
+        <div className="flex justify-between items-center p-6 border-b border-dark-border">
+          <h2 className="font-serif text-2xl text-gold flex items-center gap-2">
+            <FaShoppingBag size={20} />
+            {t('Votre Panier')}
+          </h2>
+          <button 
+            className="text-muted-text hover:text-gold transition-colors p-2" 
+            onClick={() => setIsCartOpen(false)}
+          >
+            <FaTimes size={24} />
           </button>
         </div>
 
-        <div className="cart-items">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
           {cartItems.length === 0 ? (
-            <p className="cart-empty">{t('Votre panier est vide.')}</p>
+            <div className="h-full flex flex-col items-center justify-center text-center space-y-4 opacity-50">
+              <FaShoppingBag size={48} className="text-dark-border" />
+              <p className="font-serif italic text-muted-text">{t('Votre panier est vide.')}</p>
+            </div>
           ) : (
             cartItems.map((item) => (
-              <div key={item.id} className="cart-item">
-                <img src={item.imageUrl} alt={item.name} className="cart-item-image" />
-                <div className="cart-item-details">
-                  <h4 className="serif">{i18n.language === 'ar' && item.nameAr ? item.nameAr : item.name}</h4>
-                  <p className="cart-item-price">{Number(item.price).toFixed(2)} TND</p>
+              <div key={item.id} className="flex gap-4 pb-6 border-b border-dark-border/50 animate-fade-in">
+                <div className="w-20 h-24 bg-white rounded overflow-hidden flex-shrink-0">
+                  <img src={item.imageUrl} alt={item.name} className="w-full h-full object-contain p-2" />
+                </div>
+                <div className="flex-1 flex flex-col justify-between py-1">
+                  <div>
+                    <h4 className="font-serif text-lg leading-tight">
+                      {i18n.language === 'ar' && item.nameAr ? item.nameAr : item.name}
+                    </h4>
+                    <p className="text-gold text-sm font-mono mt-1">{Number(item.price).toFixed(2)} TND</p>
+                  </div>
                   
-                  <div className="cart-item-actions">
-                    <div className="quantity-control">
-                      <button onClick={() => updateQuantity(item.id, item.quantity - 1)}><FaMinus size={10} /></button>
-                      <span>{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.id, item.quantity + 1)}><FaPlus size={10} /></button>
+                  <div className="flex justify-between items-center mt-2">
+                    <div className="flex items-center gap-4 bg-black/40 border border-dark-border rounded-full px-3 py-1">
+                      <button 
+                        className="text-muted-text hover:text-gold transition-colors"
+                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      >
+                        <FaMinus size={10} />
+                      </button>
+                      <span className="text-xs font-bold w-4 text-center">{item.quantity}</span>
+                      <button 
+                        className="text-muted-text hover:text-gold transition-colors"
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      >
+                        <FaPlus size={10} />
+                      </button>
                     </div>
-                    <button className="remove-btn" onClick={() => removeFromCart(item.id)}>
+                    <button 
+                      className="text-muted-text hover:text-red-500 transition-colors p-2" 
+                      onClick={() => removeFromCart(item.id)}
+                    >
                       <FaTrash size={14} />
                     </button>
                   </div>
@@ -90,20 +122,26 @@ function CartSidebar() {
         </div>
 
         {cartItems.length > 0 && (
-          <div className="cart-footer">
-            <div className="cart-total">
-              <span>{t('Total:')}</span>
-              <span className="serif" style={{ color: '#d4af37', fontSize: '1.2rem' }}>
-                {cartTotal.toFixed(2)} TND
+          <div className="p-6 bg-dark-card border-t border-dark-border space-y-4">
+            <div className="flex justify-between items-center">
+              <span className="text-sm uppercase tracking-widest text-muted-text">{t('Total Estimé')}</span>
+              <span className="font-serif text-2xl text-gold">
+                {cartTotal.toFixed(2)} <span className="text-xs font-sans">TND</span>
               </span>
             </div>
-            <button className="checkout-btn" onClick={handleCheckout}>
+            <button 
+              className="w-full bg-gold text-black py-4 font-bold uppercase tracking-[2px] transition-all hover:bg-[#b5952f] hover:translate-y-[-2px] active:translate-y-0" 
+              onClick={handleCheckout}
+            >
               {t('Passer la Commande')}
             </button>
+            <p className="text-[10px] text-center text-muted-text italic">
+              {t('Livraison gratuite partout en Tunisie.')}
+            </p>
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }
 

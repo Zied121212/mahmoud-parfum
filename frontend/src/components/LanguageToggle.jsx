@@ -11,20 +11,8 @@ function LanguageToggle() {
   return (
     <button 
       onClick={toggleLanguage}
-      style={{
-        background: 'transparent',
-        border: '1px solid #d4af37',
-        color: '#d4af37',
-        padding: '0.3rem 0.6rem',
-        borderRadius: '4px',
-        cursor: 'pointer',
-        fontFamily: 'var(--font-sans)',
-        fontSize: '0.9rem',
-        marginLeft: '1rem',
-        marginRight: '1rem',
-        fontWeight: 'bold'
-      }}
-      title="Changer de langue / تغيير اللغة"
+      className="flex items-center justify-center min-w-[38px] px-2 py-1 bg-transparent border border-gold/40 text-gold text-[11px] font-bold rounded-sm tracking-widest hover:bg-gold hover:text-black transition-all active:scale-95 uppercase"
+      title={i18n.language === 'fr' ? 'تغيير إلى العربية' : 'Passer au Français'}
     >
       {i18n.language === 'fr' ? 'AR' : 'FR'}
     </button>

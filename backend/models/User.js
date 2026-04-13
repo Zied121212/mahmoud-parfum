@@ -18,6 +18,10 @@ const User = sequelize.define('User', {
   },
   fullName: {
     type: DataTypes.STRING,
+  },
+  phone: {
+    type: DataTypes.STRING,
+    allowNull: true,
   }
 }, {
   tableName: 'users',
