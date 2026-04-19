@@ -15,6 +15,8 @@ require('./models/Product');
 require('./models/Order');
 require('./models/Notification');
 
+const seedDatabase = require('./seeder');
+
 const app = express();
 
 app.use(cors({ origin: '*' }));
@@ -35,6 +37,7 @@ app.listen(PORT, '0.0.0.0', async () => {
     console.log('PostgreSQL connected.');
     await sequelize.sync({ alter: true }); // similar to spring.jpa.hibernate.ddl-auto=update
     console.log('Database synchronized.');
+    await seedDatabase();
   } catch (error) {
     console.error('Unable to connect to the database:', error);
   }

@@ -5,6 +5,22 @@ import LanguageToggle from '../components/LanguageToggle';
 import { FaUserPlus, FaUser, FaEnvelope, FaPhone, FaLock } from 'react-icons/fa';
 import { API_BASE_URL } from '../apiConfig';
 
+const InputField = ({ label, name, type = "text", value, onChange, icon: Icon, required = true }) => (
+  <div className="space-y-1">
+    <label className="text-[10px] uppercase tracking-widest text-muted-text pl-1">{label}</label>
+    <div className="relative">
+      <input 
+        type={type} 
+        required={required} 
+        className="w-full bg-black/40 border border-dark-border text-light-text p-3 rounded-lg focus:border-gold outline-none transition-all pl-10 text-sm" 
+        value={value}
+        onChange={onChange}
+      />
+      {Icon && <Icon className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-text/60" size={14} />}
+    </div>
+  </div>
+);
+
 function Register() {
     const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', phone: '', password: '', confirmPassword: '' });
     const navigate = useNavigate();
@@ -41,22 +57,6 @@ function Register() {
             })
             .catch(() => alert(t('Erreur serveur.')));
     };
-
-    const InputField = ({ label, name, type = "text", value, onChange, icon: Icon, required = true }) => (
-      <div className="space-y-1">
-        <label className="text-[10px] uppercase tracking-widest text-muted-text pl-1">{label}</label>
-        <div className="relative">
-          <input 
-            type={type} 
-            required={required} 
-            className="w-full bg-black/40 border border-dark-border text-light-text p-3 rounded-lg focus:border-gold outline-none transition-all pl-10 text-sm" 
-            value={value}
-            onChange={onChange}
-          />
-          {Icon && <Icon className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-text/60" size={14} />}
-        </div>
-      </div>
-    );
 
     return (
         <div className="min-h-screen bg-dark-bg flex items-center justify-center px-6 py-12 relative overflow-hidden">

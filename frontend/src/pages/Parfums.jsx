@@ -252,13 +252,14 @@ function Parfums() {
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
                 {displayedProducts.map(product => (
                   <article key={product.id} className="group relative bg-dark-card border border-dark-border rounded overflow-hidden transition-all hover:border-gold hover:-translate-y-2 duration-500">
-                    <div className="aspect-[3/4] overflow-hidden relative">
+                    <div className="aspect-[4/5] relative bg-[#0a0a0a] p-0 flex justify-center items-center overflow-hidden">
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(215,195,150,0.05)_0%,rgba(0,0,0,0.8)_100%)] pointer-events-none border-b border-dark-border"></div>
                       <img 
                         src={product.imageUrl} 
                         alt={product.name} 
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 relative z-10" 
                       />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center z-20 backdrop-blur-[2px]">
                          <button 
                             className="bg-light-text text-black px-8 py-3 text-xs uppercase font-bold tracking-widest shadow-2xl transition-transform hover:scale-105"
                             onClick={() => { setSelectedProduct(product); setSelectedSize('50ml'); }}
@@ -302,8 +303,9 @@ function Parfums() {
               <button className="absolute top-6 right-6 text-3xl font-light hover:text-gold z-10" onClick={() => setSelectedProduct(null)}>&times;</button>
               
               <div className="grid grid-cols-1 md:grid-cols-2 max-h-[90vh] overflow-y-auto">
-                 <div className="bg-white flex items-center justify-center p-12">
-                    <img src={selectedProduct.imageUrl} alt={selectedProduct.name} className="max-h-[500px] object-contain" />
+                 <div className="bg-[#0a0a0a] relative flex items-center justify-center p-0 overflow-hidden h-full min-h-[400px]">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(215,195,150,0.05)_0%,rgba(0,0,0,0.8)_100%)] pointer-events-none border-r border-dark-border hidden md:block"></div>
+                    <img src={selectedProduct.imageUrl} alt={selectedProduct.name} className="absolute inset-0 w-full h-full object-cover relative z-10" />
                  </div>
                  <div className="p-8 md:p-12 space-y-6 flex flex-col justify-center">
                     <div className="space-y-2">
