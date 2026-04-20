@@ -7,9 +7,9 @@ async function seedPrices() {
     await sequelize.sync({ alter: true });
     const products = await Product.findAll();
     for (let p of products) {
-      if (!p.price100ml) {
-        // Multiply by 1.8 for 100ml price
-        p.price100ml = (Number(p.price) * 1.8).toFixed(2);
+      if (p.price) {
+        // Multiply by 2 for 100ml price
+        p.price100ml = (Number(p.price) * 2).toFixed(2);
         await p.save();
       }
     }

@@ -12,7 +12,13 @@ function AdminProduits() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => {
+      const updated = { ...prev, [name]: value };
+      if (name === 'price') {
+        updated.price100ml = value ? (Number(value) * 2).toFixed(2) : '';
+      }
+      return updated;
+    });
   };
 
   const handleSubmit = (e) => {
@@ -36,7 +42,7 @@ function AdminProduits() {
     });
   };
 
-  const InputGroup = ({ label, name, value, type = "text", required = true, rtl = false, placeholder = "" }) => (
+  const InputGroup = ({ label, name, value, type = "text", required = true, rtl = false, placeholder = "", readOnly = false }) => (
     <div className="space-y-2">
       <label className="text-xs uppercase tracking-widest text-muted-text pl-1">{label}</label>
       <input 
@@ -46,8 +52,9 @@ function AdminProduits() {
         onChange={handleChange} 
         required={required} 
         placeholder={placeholder}
+        readOnly={readOnly}
         step={type === "number" ? "0.01" : undefined}
-        className={`w-full bg-black/40 border border-dark-border text-light-text p-3 rounded focus:border-gold outline-none transition-all placeholder:text-white/10 ${rtl ? 'text-right' : ''}`} 
+        className={`w-full bg-black/40 border border-dark-border text-light-text p-3 rounded focus:border-gold outline-none transition-all placeholder:text-white/10 ${rtl ? 'text-right' : ''} ${readOnly ? 'opacity-50 cursor-not-allowed' : ''}`} 
       />
     </div>
   );
@@ -97,7 +104,7 @@ function AdminProduits() {
             
             <div className="grid grid-cols-2 gap-4">
                <InputGroup label="Prix 50ml (TND)" name="price" value={formData.price} type="number" />
-               <InputGroup label="Prix 100ml (TND)" name="price100ml" value={formData.price100ml} type="number" />
+               <InputGroup label="Prix 100ml (TND)" name="price100ml" value={formData.price100ml} type="number" readOnly={true} />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

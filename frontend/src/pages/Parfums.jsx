@@ -328,12 +328,12 @@ function Parfums() {
 
                     <div className="flex items-center justify-between gap-8">
                        <p className="font-serif text-3xl text-gold">
-                          {Number(selectedSize === '50ml' ? selectedProduct.price : (selectedProduct.price100ml || selectedProduct.price * 1.8)).toFixed(2)} <span className="text-sm font-sans">TND</span>
+                          {Number(selectedSize === '50ml' ? selectedProduct.price : (selectedProduct.price100ml || selectedProduct.price * 2)).toFixed(2)} <span className="text-sm font-sans">TND</span>
                        </p>
                        <button 
                           className="flex-1 bg-gold text-black py-4 text-sm font-bold uppercase tracking-widest hover:bg-[#b5952f] transition-all"
                           onClick={() => {
-                            const finalPrice = selectedSize === '50ml' ? selectedProduct.price : (selectedProduct.price100ml || selectedProduct.price * 1.8);
+                            const finalPrice = selectedSize === '50ml' ? selectedProduct.price : (selectedProduct.price100ml || selectedProduct.price * 2);
                             addToCart(selectedProduct, selectedSize, finalPrice);
                             setSelectedProduct(null);
                           }}
